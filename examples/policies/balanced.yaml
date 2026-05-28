@@ -1,0 +1,86 @@
+name: balanced
+description: |
+  Balanced security policy set.
+  Allows common operations while blocking dangerous ones.
+  Suitable for most production environments where the AI agent
+  needs reasonable access to files and network resources.
+
+policies:
+  # File operations
+  - name: allow_file_read
+    description: Allow reading files in workspace and temp directories
+    effect: allow
+    actions: ["file:read"]
+    resources: ["/tmp/*", "/var/tmp/*", "/home/*/workspace/*", "/home/*/projects/*"]
+    priority: 10
+
+  - name: allow_file_write
+    description: Allow writing files in workspace and temp directories
+    effect: allow
+    actions: ["file:write"]
+    resources: ["/tmp/*", "/var/tmp/*", "/home/*/workspace/*", "/home/*/projects/*"]
+    priority: 10
+
+  # Network operations
+  - name: allow_https_requests
+    description: Allow HTTPS requests to external services
+    effect: allow
+    actions: ["http:get", "http:post", "http:put", "http:delete", "http:request"]
+    resources: ["https://*"]
+    priority: 10
+
+  # Code execution - safe patterns only
+  - name: allow_safe_code
+    description: Allow code execution that doesn't use dangerous functions
+    effect: allow
+    actions: ["code:execute"]
+    resources: ["*"]
+    conditions:
+      - field: code
+        operator: regex_not_match
+        value: "(os\\.system|subprocess|eval\\s*\\(|exec\\s*\\(|__import__)"
+    priority: 10
+
+  # Dangerous operations - explicitly denied
+  - name: deny_sensitive_system_files
+    description: Block access to sensitive system files
+    effect: deny
+    actions: ["file:read", "file:write", "file:delete"]
+    resources: ["/etc/shadow", "/etc/passwd", "/etc/sudoers", "/etc/ssh/*"]
+    priority: 100
+
+  - name: deny_credential_access
+    description: Block access to SSH keys and cloud credentials
+    effect: deny
+    actions: ["file:read", "file:write"]
+    resources: ["~/.ssh/*", "~/.gnupg/*", "~/.aws/credentials"]
+    priority: 100
+
+  - name: deny_internal_network
+    description: Block internal/private network access
+    effect: deny
+    actions: ["http:*"]
+    resources: ["*"]
+    conditions:
+      - field: resource
+        operator: regex_match
+        value: "(127\\.|10\\.|172\\.(1[6-9]|2[0-9]|3[01])\\.|192\\.168\\.|169\\.254\\.)"
+    priority: 100
+
+  - name: deny_dangerous_code
+    description: Block dangerous code execution patterns
+    effect: deny
+    actions: ["code:execute", "code:eval"]
+    resources: ["*"]
+    conditions:
+      - field: code
+        operator: regex_match
+        value: "(os\\.system|subprocess\\.Popen|eval\\s*\\(|exec\\s*\\(|__import__\\s*\\()"
+    priority: 100
+
+  - name: deny_system_file_deletion
+    description: Block deletion of system files
+    effect: deny
+    actions: ["file:delete"]
+    resources: ["/etc/*", "/bin/*", "/sbin/*", "/usr/*", "/boot/*", "/lib/*"]
+    priority: 100

@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "agentshield"
+version = "1.0.0"
+description = "A lightweight AI Agent policy governance engine"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+authors = [
+    {name = "AgentShield Team", email = "team@agentshield.dev"},
+]
+keywords = ["ai", "agent", "policy", "governance", "security", "guard"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+]
+
+dependencies = [
+    "pyyaml>=5.4",
+]
+
+[project.optional-dependencies]
+dashboard = ["flask>=2.0"]
+dev = ["flask>=2.0", "pyyaml>=5.4"]
+
+[project.urls]
+Homepage = "https://github.com/agentshield/agentshield"
+Repository = "https://github.com/agentshield/agentshield"
+Issues = "https://github.com/agentshield/agentshield/issues"
+
+[project.scripts]
+agentshield = "agentshield.dashboard.app:run_dashboard"
+
+[tool.setuptools]
+packages = ["agentshield", "agentshield.core", "agentshield.guards", "agentshield.audit", "agentshield.dashboard", "agentshield.templates"]
+
+[tool.setuptools.package-data]
+agentshield = ["py.typed"]

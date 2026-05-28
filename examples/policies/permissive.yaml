@@ -1,0 +1,60 @@
+name: permissive
+description: |
+  Permissive policy set (audit-only mode).
+  Allows all operations but logs policy decisions for auditing.
+  Suitable for development and testing environments where you want
+  to monitor agent behavior without blocking operations.
+
+policies:
+  # Allow everything
+  - name: allow_all
+    description: Allow all actions (audit-only mode)
+    effect: allow
+    actions: ["*"]
+    resources: ["*"]
+    priority: 0
+
+  # Tagged policies for audit visibility
+  - name: log_sensitive_file_access
+    description: Log access to sensitive files (still allowed)
+    effect: allow
+    actions: ["file:read", "file:write", "file:delete"]
+    resources: ["/etc/*", "~/.ssh/*", "~/.aws/*", "~/.gnupg/*"]
+    priority: 10
+    tags: ["audit", "sensitive"]
+
+  - name: log_internal_network
+    description: Log internal network access (still allowed)
+    effect: allow
+    actions: ["http:*"]
+    resources: ["*"]
+    conditions:
+      - field: resource
+        operator: regex_match
+        value: "(127\\.|10\\.|172\\.(1[6-9]|2[0-9]|3[01])\\.|192\\.168\\.)"
+    priority: 10
+    tags: ["audit", "network"]
+
+  - name: log_code_execution
+    description: Log code execution (still allowed)
+    effect: allow
+    actions: ["code:execute", "code:eval"]
+    resources: ["*"]
+    priority: 10
+    tags: ["audit", "code"]
+
+  - name: log_prompt_submissions
+    description: Log all prompt submissions for review
+    effect: allow
+    actions: ["prompt:submit", "prompt:generate"]
+    resources: ["*"]
+    priority: 10
+    tags: ["audit", "prompt"]
+
+  - name: log_http_requests
+    description: Log all HTTP requests
+    effect: allow
+    actions: ["http:get", "http:post", "http:put", "http:delete", "http:request"]
+    resources: ["*"]
+    priority: 10
+    tags: ["audit", "network"]

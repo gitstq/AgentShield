@@ -1,0 +1,96 @@
+name: strict
+description: |
+  Maximum security policy set.
+  Denies all actions by default. Only explicitly allowed operations are permitted.
+  Suitable for high-security environments where the AI agent must operate
+  within tightly constrained boundaries.
+
+policies:
+  # Default: deny everything
+  - name: default_deny_all
+    description: Deny all actions by default
+    effect: deny
+    actions: ["*"]
+    resources: ["*"]
+    priority: 0
+
+  # File operations - only /tmp allowed
+  - name: allow_tmp_read
+    description: Allow reading from /tmp directory
+    effect: allow
+    actions: ["file:read"]
+    resources: ["/tmp/*", "/var/tmp/*"]
+    priority: 10
+
+  - name: allow_tmp_write
+    description: Allow writing to /tmp directory
+    effect: allow
+    actions: ["file:write"]
+    resources: ["/tmp/*", "/var/tmp/*"]
+    priority: 10
+
+  # Network - only specific HTTPS endpoints
+  - name: allow_https_api
+    description: Allow HTTPS API requests to approved domains
+    effect: allow
+    actions: ["http:get", "http:post"]
+    resources: ["https://api.example.com/*"]
+    priority: 10
+
+  # Explicit denials (defense in depth)
+  - name: deny_etc_access
+    description: Block access to /etc directory
+    effect: deny
+    actions: ["file:read", "file:write", "file:delete"]
+    resources: ["/etc/*"]
+    priority: 100
+
+  - name: deny_system_files
+    description: Block access to system binary directories
+    effect: deny
+    actions: ["file:read", "file:write", "file:delete"]
+    resources: ["/bin/*", "/sbin/*", "/usr/bin/*", "/usr/sbin/*", "/boot/*"]
+    priority: 100
+
+  - name: deny_home_sensitive
+    description: Block access to sensitive home directory files
+    effect: deny
+    actions: ["file:read", "file:write"]
+    resources: ["~/.ssh/*", "~/.gnupg/*", "~/.aws/*", "~/.config/*"]
+    priority: 100
+
+  - name: deny_http_non_https
+    description: Block all non-HTTPS requests
+    effect: deny
+    actions: ["http:*"]
+    resources: ["*"]
+    conditions:
+      - field: resource
+        operator: regex_match
+        value: "^http://"
+    priority: 100
+
+  - name: deny_internal_network
+    description: Block internal/private network access
+    effect: deny
+    actions: ["http:*"]
+    resources: ["*"]
+    conditions:
+      - field: resource
+        operator: regex_match
+        value: "(127\\.|10\\.|172\\.(1[6-9]|2[0-9]|3[01])\\.|192\\.168\\.)"
+    priority: 100
+
+  - name: deny_code_execution
+    description: Block all code execution
+    effect: deny
+    actions: ["code:execute", "code:eval", "code:exec"]
+    resources: ["*"]
+    priority: 100
+
+  - name: deny_file_delete
+    description: Block all file deletion
+    effect: deny
+    actions: ["file:delete"]
+    resources: ["*"]
+    priority: 100

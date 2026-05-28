@@ -1,0 +1,5 @@
+# Core dependencies (stdlib-only except pyyaml for YAML policy files)
+pyyaml>=5.4
+
+# Optional: Dashboard
+# flask>=2.0
