@@ -478,3 +478,40 @@ class BuiltinTemplates:
             )
 
         return loader()
+
+
+# Convenience functions for easy import
+def get_builtin_template(name: str) -> PolicySet:
+    """Get a built-in policy template by name.
+
+    This is a convenience wrapper around BuiltinTemplates.get_template().
+
+    Args:
+        name: Template name. One of: 'strict', 'balanced', 'permissive', 'owasp_top10'.
+
+    Returns:
+        A PolicySet configured with the requested security profile.
+
+    Raises:
+        ValueError: If the template name is unknown.
+
+    Example:
+        >>> from agentshield import get_builtin_template
+        >>> policies = get_builtin_template("balanced")
+    """
+    return BuiltinTemplates.get_template(name)
+
+
+def list_builtin_templates() -> dict:
+    """List all available built-in policy templates.
+
+    Returns:
+        Dictionary mapping template names to their descriptions.
+
+    Example:
+        >>> from agentshield import list_builtin_templates
+        >>> templates = list_builtin_templates()
+        >>> for name, desc in templates.items():
+        ...     print(f"{name}: {desc}")
+    """
+    return BuiltinTemplates.get_all_templates()

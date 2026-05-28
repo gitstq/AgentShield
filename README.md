@@ -74,14 +74,14 @@ from agentshield import PolicyEngine, get_builtin_template
 
 # 加载内置平衡策略模板
 engine = PolicyEngine()
-engine.load_policies(get_builtin_template("balanced"))
+engine.load_policy_set(get_builtin_template("balanced"))
 
 # 检查操作是否被允许
 result = engine.evaluate("file:read", "/etc/passwd")
-print(result.decision)  # "deny"
+print(result)  # False (denied)
 
 result = engine.evaluate("file:read", "/tmp/data.txt")
-print(result.decision)  # "allow"
+print(result)  # True (allowed)
 ```
 
 **装饰器集成：**
@@ -172,20 +172,22 @@ print(result.reason)   # "检测到角色操纵模式"
 ```python
 from agentshield.audit import AuditLogger
 
-logger = AuditLogger(buffer_size=100, auto_flush=True)
-logger.log_decision(
+logger = AuditLogger()
+logger.log(
     agent_id="agent-001",
     action="file:read",
     resource="/etc/passwd",
-    decision="deny",
+    decision="denied",
     policy_name="保护敏感文件"
 )
 
 # 导出为 JSON
-logger.export("audit_log.json", format="json")
+logger.export_to_file("audit_log.json")
 
 # 导出为 CSV
-logger.export("audit_log.csv", format="csv")
+csv_data = logger.export_csv()
+with open("audit_log.csv", "w") as f:
+    f.write(csv_data)
 ```
 
 #### 启动 Web 仪表盘
@@ -314,14 +316,14 @@ from agentshield import PolicyEngine, get_builtin_template
 
 # 載入內建平衡策略模板
 engine = PolicyEngine()
-engine.load_policies(get_builtin_template("balanced"))
+engine.load_policy_set(get_builtin_template("balanced"))
 
 # 檢查操作是否被允許
 result = engine.evaluate("file:read", "/etc/passwd")
-print(result.decision)  # "deny"
+print(result)  # False (denied)
 
 result = engine.evaluate("file:read", "/tmp/data.txt")
-print(result.decision)  # "allow"
+print(result)  # True (allowed)
 ```
 
 **裝飾器整合：**
@@ -412,20 +414,22 @@ print(result.reason)   # "偵測到角色操縱模式"
 ```python
 from agentshield.audit import AuditLogger
 
-logger = AuditLogger(buffer_size=100, auto_flush=True)
-logger.log_decision(
+logger = AuditLogger()
+logger.log(
     agent_id="agent-001",
     action="file:read",
     resource="/etc/passwd",
-    decision="deny",
+    decision="denied",
     policy_name="保護敏感檔案"
 )
 
 # 匯出為 JSON
-logger.export("audit_log.json", format="json")
+logger.export_to_file("audit_log.json")
 
 # 匯出為 CSV
-logger.export("audit_log.csv", format="csv")
+csv_data = logger.export_csv()
+with open("audit_log.csv", "w") as f:
+    f.write(csv_data)
 ```
 
 #### 啟動 Web 儀表板
@@ -554,14 +558,14 @@ from agentshield import PolicyEngine, get_builtin_template
 
 # Load built-in balanced policy template
 engine = PolicyEngine()
-engine.load_policies(get_builtin_template("balanced"))
+engine.load_policy_set(get_builtin_template("balanced"))
 
 # Check if an action is allowed
 result = engine.evaluate("file:read", "/etc/passwd")
-print(result.decision)  # "deny"
+print(result)  # False (denied)
 
 result = engine.evaluate("file:read", "/tmp/data.txt")
-print(result.decision)  # "allow"
+print(result)  # True (allowed)
 ```
 
 **Decorator Integration:**
@@ -652,20 +656,22 @@ print(result.reason)   # "Role manipulation pattern detected"
 ```python
 from agentshield.audit import AuditLogger
 
-logger = AuditLogger(buffer_size=100, auto_flush=True)
-logger.log_decision(
+logger = AuditLogger()
+logger.log(
     agent_id="agent-001",
     action="file:read",
     resource="/etc/passwd",
-    decision="deny",
+    decision="denied",
     policy_name="Protect Sensitive Files"
 )
 
 # Export as JSON
-logger.export("audit_log.json", format="json")
+logger.export_to_file("audit_log.json")
 
 # Export as CSV
-logger.export("audit_log.csv", format="csv")
+csv_data = logger.export_csv()
+with open("audit_log.csv", "w") as f:
+    f.write(csv_data)
 ```
 
 #### Launch Web Dashboard
